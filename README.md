@@ -56,3 +56,18 @@ Proyecto previsto: sa-ntiago/gasto-cuentas-2026. Sitio estático: Framework Pres
 Para actualizar con otros meses de 2026, volver a consolidar el rango completo o incorporar solo períodos sin solapamiento; nunca sumar dos exportaciones acumuladas con fechas coincidentes.
 
 **Atención:** el repositorio GitHub es público. Los montos consolidados incluidos en él también son públicos.
+
+## Nueva vista: Marcas 2026 (sin alterar Capital)
+
+La ruta **/marcas-2026.html** presenta la hoja **Provisión 2026** del archivo **Proceso de Facturación .xlsx** como un módulo independiente del consolidado publicitario previo. La app original conserva intactas sus fuentes y cifras (incluido Capital); se añadió únicamente un enlace para abrir la nueva vista.
+
+- Marcas: Citroën, Clínica del Country, Clínica La Colina, Compensar, Derco, Honda, Novartis, Suzuki, WeWork CAS y WeWork MX.
+- Cobertura: **enero a septiembre de 2026**, 121 registros con trazabilidad al número de fila.
+- Métrica principal: columna D **Real Cumplido** = **5.283.415.431,06** unidades del archivo; **Planeado** (E) y **Gasto Factura** (F) son métricas separadas.
+- Normalizaciones: Suzuki con/sin espacio, WeWork CAS en distintas capitalizaciones, Clínica del Country/Country y Clínica La Colina/Colina; WeWork MX se conserva aparte.
+- No se rellena la celda sin Real Cumplido de Compensar / TikTok Ads / septiembre con cero; se muestra como dato no disponible.
+- **Moneda**: no existe columna de moneda en la hoja. Se muestran los montos originales con símbolo $ y no se mezclan con el histórico publicitario COP/MXN.
+- Los datos derivados se guardan en **billing-2026.packed.js**, en formato zlib/deflate base64, sin publicar el XLSX original.
+- El navegador ofrece filtros por marca, mes y plataforma, tablas de resumen y detalle y exportación CSV.
+
+Importante: el repositorio es público y los datos derivados de esta hoja también son visibles públicamente.
