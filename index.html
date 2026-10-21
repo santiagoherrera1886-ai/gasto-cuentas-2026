@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gasto de plataformas 2026</title>
+<style>
+:root{font:14px system-ui,Arial,sans-serif;color:#1c2a3a;background:#f4f6fa}
+*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #dfe5ed;padding:22px max(18px,calc((100vw - 1160px)/2))}
+header h1{font-size:24px;margin:0 0 7px}p{color:#647487;line-height:1.5;margin:4px 0}
+main{max-width:1196px;margin:auto;padding:20px 18px 45px}
+.panel,.kpi{background:white;border:1px solid #dce3ea;border-radius:9px;padding:17px}
+.filters{display:flex;flex-wrap:wrap;gap:9px;align-items:end}.field{flex:1 1 175px}.field.wide{flex:2 1 230px}
+label{font-size:12px;font-weight:700;display:block;color:#536277;margin-bottom:4px}
+select,input{width:100%;font:inherit;min-height:40px;background:white;border:1px solid #bac7d3;border-radius:6px;padding:9px}
+button{font:inherit;background:#fff;color:#20416d;border:1px solid #aabaca;border-radius:6px;padding:10px 12px;cursor:pointer}
+button:hover{background:#eef4fa}button.active,button.primary{background:#1c5595;color:#fff;border-color:#1c5595}
+.muted,small{color:#6c7c8d}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi strong{font-size:23px;display:block;margin:9px 0 3px;overflow-wrap:anywhere}.tabs{display:flex;gap:8px;margin:18px 0 13px;flex-wrap:wrap}
+h2{margin:0 0 11px;font-size:18px}h3{margin:0 0 10px;font-size:15px}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:13px 0}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:13px}th,td{border-bottom:1px solid #e7edf3;padding:10px;text-align:left;vertical-align:top}
+th{background:#f5f7fa;color:#53657a;font-size:12px;position:sticky;top:0}.scroll{overflow:auto}
+.money{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:650}.long{overflow-wrap:anywhere;max-width:490px}
+.bar{display:grid;grid-template-columns:130px 1fr 160px;gap:9px;align-items:center;padding:12px 0;border-bottom:1px solid #eff2f5}
+.track{background:#edf2f6;border-radius:7px;overflow:hidden;height:13px}.fill{background:#2971bc;height:100%}
+.note{background:#fff8e9;border-left:3px solid #d8a03a;color:#67512b;padding:13px;margin:14px 0;line-height:1.5}
+.section[hidden]{display:none}.between{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tag{font-size:11px;border:1px solid #c8d5e0;border-radius:5px;padding:2px 5px;white-space:nowrap}
+.alert{color:#b34332;font-weight:700}.empty{padding:22px;color:#7a899b;text-align:center}
+footer{color:#708096;font-size:12px;margin-top:24px}
+@media(max-width:820px){.columns{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.bar{grid-template-columns:95px 1fr 125px}.bar span{font-size:12px}}
+</style>
+</head>
+<body>
+<header><h1>Gasto de plataformas · 2026</h1>
+<p><strong>Período reportado: enero 1 a septiembre 30 de 2026</strong></p>
+<p>Meta Ads · Google Ads · TikTok Ads. Acumulado histórico, no se actualiza automáticamente.</p></header>
+<main>
+<section class="panel">
+ <div class="filters">
+  <div class="field"><label for="platform">Plataforma</label><select id="platform"><option value="">Todas</option><option>Meta Ads</option><option>Google Ads</option><option>TikTok Ads</option></select></div>
+  <div class="field"><label for="client">Cliente</label><select id="client"><option value="">Todos</option></select></div>
+  <div class="field"><label for="source">Archivo</label><select id="source"><option value="">Todos</option></select></div>
+  <div class="field"><label for="currency">Moneda</label><select id="currency"><option>COP</option><option>MXN</option></select></div>
+  <div class="field wide"><label for="search">Buscar cliente/cuenta</label><input id="search" placeholder="Escribe para filtrar"></div>
+  <button id="reset">Restablecer</button>
+ </div>
+ <p id="status">Cargando datos auditados...</p>
+</section>
+<nav class="tabs" aria-label="Secciones del dashboard">
+<button class="active" data-tab="overview">Resumen</button>
+<button data-tab="accounts">Cuentas</button>
+<button data-tab="campaigns">Campañas</button>
+<button data-tab="audit">Validación de archivos</button>
+</nav>
+<section class="section" id="overview">
+ <div class="kpis">
+  <div class="kpi"><small>Gasto seleccionado</small><strong id="spend">—</strong><small>Acumulado ene.–sep.</small></div>
+  <div class="kpi"><small>Cuentas</small><strong id="accounts-count">—</strong><small>Filtradas</small></div>
+  <div class="kpi"><small>Clientes</small><strong id="clients-count">—</strong><small>Identificados + otros</small></div>
+  <div class="kpi"><small>Plataformas</small><strong id="platforms-count">—</strong><small>Con inversión</small></div>
+ </div>
+ <div class="columns">
+   <div class="panel"><h2>Por plataforma</h2><div id="platform-bars"></div></div>
+   <div class="panel"><h2>Por cliente</h2><div id="client-bars"></div></div>
+ </div>
+ <p class="note"><strong>Metodología:</strong> Google Ads usa el total de la cuenta cuando difiere de la suma visible de campañas. Se excluyen las filas duplicadas de totales. COP y MXN se consultan separadamente; no se convierten.</p>
+</section>
+<section class="section" id="accounts" hidden>
+ <div class="panel">
+ <div class="between"><div><h2>Inversión por cuenta</h2><p>Filtra por plataforma, cliente, archivo o palabra.</p></div><button id="download-accounts" class="primary">Descargar CSV</button></div>
+ <div class="scroll"><table><thead><tr><th>Plataforma</th><th>Cliente</th><th>Cuenta</th><th>Origen</th><th class="money">Gasto</th></tr></thead><tbody id="account-table"></tbody></table></div>
+ </div>
+</section>
+<section class="section" id="campaigns" hidden>
+ <div class="panel">
+ <div class="between"><div><h2>Campañas con gasto</h2><p>Campañas con inversión positiva en archivos Google y TikTok.</p></div><button id="download-campaigns" class="primary">Descargar CSV</button></div>
+ <div class="filters"><div class="field wide"><label for="campaign-search">Buscar campaña</label><input id="campaign-search" placeholder="Nombre de campaña"></div>
+ <div class="field"><label for="campaign-source">Archivo de campaña</label><select id="campaign-source"><option value="">Todos</option></select></div></div>
+ <p class="note">El detalle de campañas es informativo y <strong>no se suma a los totales</strong>. Algunos reportes de Google solo muestran una parte de las campañas de la cuenta. Meta solo se entregó consolidado por cuenta.</p>
+ <p id="campaign-count"></p>
+ <div class="scroll"><table><thead><tr><th>Plataforma</th><th>Campaña</th><th>Archivo</th><th class="money">Gasto</th></tr></thead><tbody id="campaign-table"></tbody></table></div>
+ </div>
+</section>
+<section class="section" id="audit" hidden>
+ <div class="panel">
+ <h2>Conciliación de los 9 archivos</h2>
+ <p>La columna “Total de cuenta” es la que alimenta el tablero. La “Diferencia” es el total menos la suma de campañas visibles; puede reflejar exportaciones filtradas.</p>
+ <div class="scroll"><table><thead><tr><th>Archivo</th><th>Plataforma</th><th class="money">Total de cuenta COP</th><th class="money">Campañas visibles COP</th><th class="money">Diferencia COP</th><th>Estado</th></tr></thead><tbody id="audit-table"></tbody></table></div>
+ <p class="note"><strong>Alcance de datos:</strong> sin desglose mensual ni datos del cuarto trimestre. El reporte general de Google no identifica cuenta/cliente y se deja en “Otros / sin identificar”. El gasto en MXN de WeWork México está separado del total en COP.</p>
+ </div>
+</section>
+<footer>Fuente: 9 archivos compartidos para 2026-01-01 a 2026-09-30. App estática sin credenciales ni conexión a APIs publicitarias. Los datos se incluyen en el repositorio.</footer>
+</main>
+<script src="data.packed.js"></script>
+<script>
+"use strict";
+var D=null;
+var e=function(id){return document.getElementById(id)};
+var money=function(v,cur){return cur+" "+new Intl.NumberFormat(cur==="MXN"?"es-MX":"es-CO",{maximumFractionDigits:cur==="MXN"?2:0,minimumFractionDigits:cur==="MXN"?2:0}).format(v||0)};
+var fnum=function(v){return new Intl.NumberFormat("es-CO").format(v)};
+var norm=function(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()};
+var esc=function(v){return String(v==null?"":v).replace(/[&<>"']/g,function(t){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[t]})};
+var src=function(id){return D.sources.find(function(x){return x.id===id})};
+var sorted=function(a,b){return b.v-a.v};
+function accountRows(){
+ var p=e("platform").value,c=e("client").value,s=e("source").value,m=e("currency").value,q=norm(e("search").value);
+ return D.accounts.filter(function(r){return r.m===m&&(!p||r.p===p)&&(!c||r.c===c)&&(!s||r.s===s)&&(!q||norm([r.c,r.a,r.p,src(r.s).file].join(" ")).includes(q))}).sort(sorted);
+}
+function grouping(rows,key){
+ var m=new Map();rows.forEach(function(r){m.set(r[key],(m.get(r[key])||0)+r.v)});
+ return Array.from(m).map(function(x){return {name:x[0],v:x[1]}}).sort(sorted);
+}
+function bars(id,groups,cur){
+ var total=groups.reduce(function(a,r){return a+r.v},0),top=Math.max(1,...groups.map(function(x){return x.v}));
+ e(id).innerHTML=groups.length?groups.map(function(x){
+  return '<div class="bar"><span>'+esc(x.name)+'</span><div class="track"><div class="fill" style="width:'+Math.max(1,100*x.v/top)+'%"></div></div><span class="money">'+money(x.v,cur)+' <small>('+((x.v/total)*100).toFixed(1)+'%)</small></span></div>';
+ }).join(""):'<div class="empty">Sin datos para estos filtros.</div>';
+}
+function render(){
+ if(!D)return;
+ var rs=accountRows(),cur=e("currency").value;
+ var total=rs.reduce(function(a,r){return a+r.v},0);
+ e("spend").textContent=money(total,cur);
+ e("accounts-count").textContent=fnum(rs.length);
+ e("clients-count").textContent=fnum(new Set(rs.map(function(x){return x.c})).size);
+ e("platforms-count").textContent=fnum(new Set(rs.map(function(x){return x.p})).size);
+ e("status").textContent=rs.length+" cuentas · moneda "+cur+" · corte 30/09/2026";
+ bars("platform-bars",grouping(rs,"p"),cur);bars("client-bars",grouping(rs,"c"),cur);
+ e("account-table").innerHTML=rs.length?rs.map(function(r){
+  return "<tr><td>"+esc(r.p)+"</td><td>"+esc(r.c)+"</td><td class='long'>"+esc(r.a)+"</td><td><span class='tag'>"+esc(r.s)+"</span> "+esc(src(r.s).file)+"</td><td class='money'>"+money(r.v,r.m)+"</td></tr>";
+ }).join(""):'<tr><td colspan="5" class="empty">Sin resultados</td></tr>';
+ renderCampaigns();
+}
+function campaignRows(){
+ if(!D)return [];
+ var p=e("platform").value,m=e("currency").value,s=e("source").value,cs=e("campaign-source").value,q=norm(e("campaign-search").value);
+ return D.campaigns.map(function(x){return {s:x[0],n:x[1],v:x[2],m:x[3],p:src(x[0]).platform}})
+ .filter(function(r){return r.m===m&&(!p||r.p===p)&&(!s||r.s===s)&&(!cs||r.s===cs)&&(!q||norm(r.n).includes(q))}).sort(sorted);
+}
+function renderCampaigns(){
+ var rs=campaignRows();
+ e("campaign-count").textContent=rs.length+" campañas coinciden. Se muestran hasta 120, pero el CSV incluye todas.";
+ e("campaign-table").innerHTML=rs.length?rs.slice(0,120).map(function(r){
+  return "<tr><td>"+esc(r.p)+"</td><td class='long'>"+esc(r.n)+"</td><td><span class='tag'>"+esc(r.s)+"</span></td><td class='money'>"+money(r.v,r.m)+"</td></tr>";
+ }).join(""):'<tr><td colspan="4" class="empty">Sin campañas para estos filtros</td></tr>';
+}
+function audit(){
+ e("audit-table").innerHTML=D.sources.map(function(s){
+  var meta=s.platform==="Meta Ads",diff=Math.abs(s.difference)>1,mark=meta?"Solo cuenta":diff?"Diferencia en detalle":"Conciliado";
+  return "<tr><td><span class='tag'>"+s.id+"</span> "+esc(s.file)+"</td><td>"+esc(s.platform)+"</td><td class='money'>"+money(s.accountTotal,"COP")+"</td><td class='money'>"+(meta?"—":money(s.detailTotal,"COP"))+"</td><td class='money "+(diff?"alert":"")+"'>"+(meta?"—":diff?money(s.difference,"COP"):"COP 0")+"</td><td>"+mark+"</td></tr>";
+ }).join("");
+}
+function exportRows(filename,header,rows){
+ var clean=function(x){var t=String(x==null?"":x);if(/^[=+@\t\r]/.test(t))t="'"+t;return '"'+t.replace(/"/g,'""')+'"'};
+ var csv="\ufeff"+[header].concat(rows).map(function(row){return row.map(clean).join(";")}).join("\r\n");
+ var link=document.createElement("a"),url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+ link.href=url;link.download=filename;document.body.appendChild(link);link.click();link.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+}
+function option(value,label){var x=document.createElement("option");x.value=value;x.textContent=label;return x}
+async function start(){
+ try{
+  var b=Uint8Array.from(atob(window.GASTO_2026_DEFLATE),function(t){return t.charCodeAt(0)});
+  var stream=new Blob([b]).stream().pipeThrough(new DecompressionStream("deflate"));
+  D=JSON.parse(await new Response(stream).text());
+  if(D.sources.length!==9||D.accounts.length!==23)throw new Error("Datos incompletos");
+  Array.from(new Set(D.accounts.map(function(r){return r.c}))).sort().forEach(function(c){e("client").add(option(c,c))});
+  D.sources.forEach(function(s){e("source").add(option(s.id,s.id+" · "+s.platform+" · "+s.file));if(s.detailCampaigns)e("campaign-source").add(option(s.id,s.id+" · "+s.file))});
+  ["platform","client","source","currency"].forEach(function(id){e(id).addEventListener("change",render)});
+  e("search").addEventListener("input",render);
+  e("campaign-search").addEventListener("input",renderCampaigns);
+  e("campaign-source").addEventListener("change",renderCampaigns);
+  e("reset").addEventListener("click",function(){
+   ["platform","client","source","search","campaign-search","campaign-source"].forEach(function(k){e(k).value=""});
+   e("currency").value="COP";render();
+  });
+  e("download-accounts").addEventListener("click",function(){exportRows("gasto-cuentas-2026.csv",["Plataforma","Cliente","Cuenta","Origen","Moneda","Gasto","Desde","Hasta"],accountRows().map(function(r){return [r.p,r.c,r.a,src(r.s).file,r.m,r.v,D.period[0],D.period[1]]}))});
+  e("download-campaigns").addEventListener("click",function(){exportRows("gasto-campanas-2026.csv",["Plataforma","Campaña","Origen","Moneda","Gasto","Desde","Hasta"],campaignRows().map(function(r){return [r.p,r.n,src(r.s).file,r.m,r.v,D.period[0],D.period[1]]}))});
+  document.querySelectorAll("[data-tab]").forEach(function(button){button.addEventListener("click",function(){
+   document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("active",b===button)});
+   document.querySelectorAll(".section").forEach(function(section){section.hidden=section.id!==button.dataset.tab});
+  })});
+  audit();render();
+ }catch(err){console.error(err);e("status").textContent="Error cargando los datos: "+err.message;e("status").className="alert"}
+}
+start();
+</script></body></html>
