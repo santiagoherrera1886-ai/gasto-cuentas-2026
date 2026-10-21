@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marcas 2026 · Gasto de medios</title>
+<style>
+:root{font:14px system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:#f4f6fa;color:#16263a}
+*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #dce4eb;padding:18px max(18px,calc((100vw - 1180px)/2))}
+h1{font-size:24px;margin:6px 0}h2{font-size:17px;margin:0 0 12px}h3{font-size:14px;margin:0 0 8px}
+p{margin:5px 0;line-height:1.5;color:#5e6e82}
+a{color:#165ca3}main{max-width:1216px;padding:20px 18px 55px;margin:auto}
+.panel,.kpi{background:#fff;border:1px solid #dce5ee;border-radius:9px;padding:17px}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.field{flex:1 1 150px}label{display:block;font-size:12px;font-weight:700;color:#4f6175;margin-bottom:5px}
+select{width:100%;background:white;border:1px solid #bfcbd8;border-radius:6px;padding:10px;font:inherit;min-height:42px}
+button{cursor:pointer;background:#fff;color:#24558a;border:1px solid #aebdcc;border-radius:6px;padding:10px 12px;font:inherit}
+button:hover{background:#eef4fb}button.selected,.primary{background:#195798;color:#fff;border-color:#195798}
+.brand-picker{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 15px}
+.brand-picker button{font-size:12px;padding:8px 11px}
+.tip{background:#eef4fc;border-left:3px solid #5489bf;padding:11px 13px;margin:14px 0;border-radius:0 6px 6px 0}
+.note{background:#fff7e8;border-left:3px solid #e7b859;padding:12px 14px;margin:14px 0;color:#64512d}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:13px 0}
+.kpi strong{font-size:23px;display:block;margin:9px 0 2px;overflow-wrap:anywhere}.kpi small,small{color:#6e7e90}
+.charts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.bar{display:grid;grid-template-columns:112px minmax(32px,1fr) 118px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #eff1f5}
+.bar span{overflow-wrap:anywhere;font-size:12px}.bar .amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+.track{background:#eaf0f7;height:11px;border-radius:8px;overflow:hidden}.fill{height:100%;background:#3774b7}
+.scroll{max-width:100%;overflow:auto}table{border-collapse:collapse;min-width:750px;width:100%;font-size:13px}
+th,td{border-bottom:1px solid #e7edf3;padding:9px 10px;text-align:left}th{background:#f6f8fb;color:#5c6b7e;font-size:12px;position:sticky;top:0}
+.money{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.muted{color:#718194}.between{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.badge{background:#eaf2fa;color:#3c6488;border:1px solid #d6e6f5;border-radius:4px;padding:2px 6px;font-size:11px}
+footer{margin-top:24px;font-size:12px;color:#6b7a8a}
+@media(max-width:1000px){.charts{grid-template-columns:1fr}.bar{grid-template-columns:150px 1fr 155px}}
+@media(max-width:650px){.kpis{grid-template-columns:1fr 1fr}.kpi{padding:12px}.kpi strong{font-size:18px}.bar{grid-template-columns:92px 1fr 110px}.bar span{font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+<a href="./index.html">← Volver al dashboard original (incluye Capital)</a>
+<h1>Marcas · gasto de medios 2026</h1>
+<p>Provisión 2026 · detalle por cliente, plataforma y mes · enero a septiembre.</p>
+</header>
+<main>
+<section class="panel">
+ <h2>Selecciona la marca</h2>
+ <div class="brand-picker" id="brands"><span>Cargando marcas…</span></div>
+ <div class="filters">
+  <div class="field"><label for="brand">Marca</label><select id="brand"><option value="">Todas las marcas</option></select></div>
+  <div class="field"><label for="month">Mes 2026</label><select id="month"><option value="">Todos los meses</option></select></div>
+  <div class="field"><label for="platform">Plataforma / medio</label><select id="platform"><option value="">Todas las plataformas</option></select></div>
+  <button id="clear">Limpiar filtros</button>
+ </div>
+ <p id="status" role="status" class="muted">Leyendo Provisión 2026…</p>
+</section>
+<div class="tip"><strong>Capital no se ha quitado ni mezclado.</strong> Los datos que ya tenías siguen en el <a href="./index.html">dashboard original</a>. Capital no aparece como marca en la hoja Provisión 2026, así que conservamos ambas fuentes separadas para no duplicar inversión.</div>
+<section class="kpis">
+ <div class="kpi"><small>Real cumplido</small><strong id="real">—</strong><small>Columna D · inversión ejecutada</small></div>
+ <div class="kpi"><small>Planeado</small><strong id="plan">—</strong><small>Columna E</small></div>
+ <div class="kpi"><small>Gasto factura informado</small><strong id="invoice">—</strong><small id="invoices-note">Columna F</small></div>
+ <div class="kpi"><small>Real vs. plan</small><strong id="ratio">—</strong><small id="rows-count">Registros de la hoja</small></div>
+</section>
+<p class="note"><strong>Precisión:</strong> la hoja no tiene columna de moneda. Mostramos los valores con símbolo $ y sin convertir divisas. Real cumplido, planeado y gasto factura son tres conceptos distintos. Una celda en blanco aparece como “—”, nunca como gasto cero.</p>
+<div class="charts">
+ <section class="panel"><h3>Por marca</h3><div id="by-brand"></div></section>
+ <section class="panel"><h3>Por plataforma</h3><div id="by-platform"></div></section>
+ <section class="panel"><h3>Evolución mensual (real cumplido)</h3><div id="by-month"></div></section>
+</div>
+<section class="panel" style="margin-top:13px">
+ <div class="between"><h2>Consolidado por marca</h2><button class="primary" id="csv">Exportar CSV</button></div>
+ <div class="scroll"><table><thead><tr><th>Marca</th><th>Registros</th><th class="money">Real cumplido</th><th class="money">Planeado</th><th class="money">Gasto factura registrado</th><th class="money">Real / plan</th></tr></thead><tbody id="brands-table"></tbody></table></div>
+</section>
+<section class="panel" style="margin-top:13px">
+ <h2>Detalle por mes, marca y medio</h2><p id="detail-count"></p>
+ <div class="scroll"><table><thead><tr><th>Mes</th><th>Marca</th><th>Plataforma</th><th class="money">Real cumplido</th><th class="money">Planeado</th><th class="money">Gasto factura</th><th>Fila del archivo</th></tr></thead><tbody id="detail"></tbody></table></div>
+</section>
+<footer>Fuente: Proceso de Facturación .xlsx · Provisión 2026 · 121 registros, sin incluir su fila de totales. App estática, no conectada en tiempo real a medios. El consolidado histórico original permanece sin cambios.</footer>
+</main>
+<script src="./billing-2026.packed.js"></script>
+<script>
+"use strict";
+var billing=null, records=[];
+function el(id){return document.getElementById(id)}
+function esc(x){return String(x===undefined||x===null?"":x).replace(/[&<>"']/g,function(s){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]})}
+function fmt(x){return "$ "+new Intl.NumberFormat("es-CO",{maximumFractionDigits:2}).format(x||0)}
+function optional(x){return x===null?"—":fmt(x)}
+function add(rows,key){return rows.reduce(function(s,r){return s+(r[key]===null?0:Number(r[key]))},0)}
+function makeOption(v){var o=document.createElement("option");o.textContent=v;o.value=v;return o}
+function current(){var b=el("brand").value,m=el("month").value,p=el("platform").value;return records.filter(function(r){return (!b||r.brand===b)&&(!m||r.month===m)&&(!p||r.platform===p)})}
+function group(rows,key){
+ var m=new Map();
+ rows.forEach(function(r){if(!m.has(r[key]))m.set(r[key],[]);m.get(r[key]).push(r)});
+ return Array.from(m).map(function(v){return {name:v[0],rows:v[1],value:add(v[1],"real")}}).sort(function(a,b){return b.value-a.value});
+}
+function chart(id,items,isMonth){
+ if(isMonth){var lookup=new Map(items.map(function(t){return [t.name,t]}));items=billing.months.map(function(m){return lookup.get(m)||{name:m,value:0}})}
+ var max=Math.max(1,...items.map(function(t){return t.value}));
+ el(id).innerHTML=items.length?items.map(function(t){
+  return "<div class='bar'><span>"+esc(t.name)+"</span><div class='track'><div class='fill' style='width:"+(t.value?Math.max(1,100*t.value/max):0)+"%'></div></div><span class='amount'>"+fmt(t.value)+"</span></div>";
+ }).join(""):"<p class='muted'>Sin resultados</p>";
+}
+function render(){
+ var rows=current(),actual=add(rows,"real"),planned=add(rows,"planned"),invoiced=add(rows,"invoice");
+ var missing=rows.filter(function(r){return r.invoice===null}).length;
+ var missingReal=rows.filter(function(r){return r.real===null}).length;
+ el("real").textContent=fmt(actual);
+ el("plan").textContent=fmt(planned);
+ el("invoice").textContent=fmt(invoiced);
+ el("invoices-note").textContent=missing+" facturas sin monto; campos vacíos no se suman";
+ el("ratio").textContent=planned?new Intl.NumberFormat("es-CO",{maximumFractionDigits:1}).format(actual/planned*100)+" %":"—";
+ el("rows-count").textContent=rows.length+" registros seleccionados";
+ el("status").textContent=rows.length+" registros · "+new Set(rows.map(function(r){return r.brand})).size+" marcas · "+missingReal+" registros sin Real Cumplido";
+ el("detail-count").textContent=rows.length+" registros, con trazabilidad a fila de Excel";
+ var brands=group(rows,"brand");
+ chart("by-brand",brands,false);chart("by-platform",group(rows,"platform"),false);chart("by-month",group(rows,"month"),true);
+ el("brands-table").innerHTML=brands.length?brands.map(function(g){
+  var pl=add(g.rows,"planned");
+  return "<tr><td><strong>"+esc(g.name)+"</strong></td><td>"+g.rows.length+"</td><td class='money'>"+fmt(g.value)+"</td><td class='money'>"+fmt(pl)+"</td><td class='money'>"+fmt(add(g.rows,"invoice"))+"</td><td class='money'>"+(pl?(g.value/pl*100).toFixed(1)+" %":"—")+"</td></tr>";
+ }).join(""):"<tr><td colspan='6'>Sin resultados</td></tr>";
+ el("detail").innerHTML=rows.length?rows.map(function(r){
+  return "<tr><td>"+esc(r.month)+"</td><td>"+esc(r.brand)+"</td><td>"+esc(r.platform)+"</td><td class='money'>"+optional(r.real)+"</td><td class='money'>"+optional(r.planned)+"</td><td class='money'>"+optional(r.invoice)+"</td><td><span class='badge'>"+r.row+"</span></td></tr>";
+ }).join(""):"<tr><td colspan='7'>Sin resultados</td></tr>";
+ el("brands").querySelectorAll("button[data-brand]").forEach(function(b){b.classList.toggle("selected",b.dataset.brand===el("brand").value)});
+}
+function exportCSV(){
+ var head=["Mes","Marca","Plataforma","Real Cumplido","Planeado","Gasto Factura","Fila Excel","Fuente"];
+ var rows=current().map(function(r){return [r.month,r.brand,r.platform,r.real,r.planned,r.invoice,r.row,billing.source]});
+ function cell(v){var s=String(v===null||v===undefined?"":v);if(/^[=+@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+ var csv="\ufeff"+[head].concat(rows).map(function(r){return r.map(cell).join(";")}).join("\r\n");
+ var url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+ var a=document.createElement("a");a.href=url;a.download="marcas-provision-2026.csv";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+}
+async function init(){
+ try{
+  var bytes=Uint8Array.from(atob(window.FACTURACION_2026_DEFLATE),function(c){return c.charCodeAt(0)});
+  var stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+  billing=JSON.parse(await new Response(stream).text());
+  records=billing.rows.map(function(r){return {month:billing.months[r[0]],brand:billing.brands[r[1]],platform:billing.platforms[r[2]],real:r[3],planned:r[4],invoice:r[5],row:r[6]}});
+  if(billing.brands.length!==10||records.length!==121||Math.abs(add(records,"real")-5283415431.06)>0.1)throw Error("Validación de totales fallida");
+  billing.brands.forEach(function(v){el("brand").add(makeOption(v))});
+  billing.platforms.forEach(function(v){el("platform").add(makeOption(v))});
+  billing.months.forEach(function(v){el("month").add(makeOption(v))});
+  el("brands").innerHTML='<button class="selected" data-brand="">Todas</button>'+billing.brands.map(function(v){return '<button data-brand="'+esc(v)+'">'+esc(v)+'</button>'}).join("");
+  el("brands").querySelectorAll("[data-brand]").forEach(function(b){b.addEventListener("click",function(){el("brand").value=b.dataset.brand;render()})});
+  ["brand","month","platform"].forEach(function(id){el(id).addEventListener("change",render)});
+  el("clear").addEventListener("click",function(){["brand","month","platform"].forEach(function(id){el(id).value=""});render()});
+  el("csv").addEventListener("click",exportCSV);
+  render();
+ }catch(err){console.error(err);el("status").textContent="Error cargando las marcas: "+err.message;el("status").style.color="#bd3030";}
+}
+init();
+</script>
+</body></html>
